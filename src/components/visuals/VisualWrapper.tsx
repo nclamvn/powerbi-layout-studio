@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useCallback } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
-import { GripVertical, X, Copy, Settings } from 'lucide-react';
+import { GripVertical, X, Copy } from 'lucide-react';
 import { GlassPanel } from '../ui/GlassPanel';
 import { useProjectStore } from '../../stores/projectStore';
 import { useUIStore } from '../../stores/uiStore';
@@ -12,14 +12,17 @@ interface VisualWrapperProps {
   children: ReactNode;
   position: { x: number; y: number; width: number; height: number };
   title?: string;
+  onVisualClick?: (id: string, e: React.MouseEvent) => void;
 }
 
-export function VisualWrapper({ id, children, position, title }: VisualWrapperProps) {
-  const { selectedVisualId, selectVisual, removeVisual, duplicateVisual } = useProjectStore();
+export function VisualWrapper({ id, children, position, title, onVisualClick }: VisualWrapperProps) {
+  const { selectedVisualIds, selectVisual, removeVisual, duplicateVisual, toggleVisualSelection } = useProjectStore();
   const { setPropertiesPanelOpen } = useUIStore();
-  const { isResizing, handleMouseDown } = useResize(id);
+  const { handleMouseDown } = useResize(id);
 
-  const isSelected = selectedVisualId === id;
+  const isSelected = selectedVisualIds.includes(id);
+  const isMultiSelected = selectedVisualIds.length > 1 && isSelected;
+  const selectionIndex = selectedVisualIds.indexOf(id);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id,
@@ -35,26 +38,40 @@ export function VisualWrapper({ id, children, position, title }: VisualWrapperPr
     zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
   };
 
-  const handleSelect = (e: React.MouseEvent) => {
+  const handleSelect = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    selectVisual(id);
-    setPropertiesPanelOpen(true);
-  };
 
-  const handleDelete = (e: React.MouseEvent) => {
+    if (onVisualClick) {
+      onVisualClick(id, e);
+    } else {
+      // Default behavior for backward compatibility
+      if (e.shiftKey) {
+        selectVisual(id, true);
+      } else if (e.ctrlKey || e.metaKey) {
+        toggleVisualSelection(id);
+      } else {
+        selectVisual(id);
+      }
+    }
+
+    setPropertiesPanelOpen(true);
+  }, [id, onVisualClick, selectVisual, toggleVisualSelection, setPropertiesPanelOpen]);
+
+  const handleDelete = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     removeVisual(id);
-  };
+  }, [id, removeVisual]);
 
-  const handleDuplicate = (e: React.MouseEvent) => {
+  const handleDuplicate = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     duplicateVisual(id);
-  };
+  }, [id, duplicateVisual]);
 
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
+      data-visual={id}
       className={`group ${isDragging ? 'opacity-80' : ''}`}
       onClick={handleSelect}
       initial={{ opacity: 0, scale: 0.95 }}
@@ -62,11 +79,22 @@ export function VisualWrapper({ id, children, position, title }: VisualWrapperPr
       transition={{ duration: 0.2 }}
     >
       <GlassPanel
-        className={`w-full h-full overflow-hidden relative ${
-          isSelected ? 'ring-2 ring-primary-500 ring-offset-2 ring-offset-dark-base' : ''
+        className={`w-full h-full overflow-hidden relative transition-all ${
+          isSelected
+            ? isMultiSelected
+              ? 'ring-2 ring-primary-400 ring-offset-2 ring-offset-dark-base'
+              : 'ring-2 ring-primary-500 ring-offset-2 ring-offset-dark-base'
+            : 'hover:ring-1 hover:ring-white/20'
         }`}
         padding="none"
       >
+        {/* Multi-select index badge */}
+        {isMultiSelected && (
+          <div className="absolute -top-2 -left-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center z-30 shadow-lg border-2 border-dark-base">
+            <span className="text-xs font-bold text-white">{selectionIndex + 1}</span>
+          </div>
+        )}
+
         {/* Toolbar */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -104,8 +132,8 @@ export function VisualWrapper({ id, children, position, title }: VisualWrapperPr
         {/* Visual Content */}
         <div className="flex-1 h-full">{children}</div>
 
-        {/* Resize Handles */}
-        {isSelected && (
+        {/* Resize Handles - only show when single selection */}
+        {isSelected && !isMultiSelected && (
           <>
             {/* Corner handles */}
             <div

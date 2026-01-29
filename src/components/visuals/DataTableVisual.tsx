@@ -18,7 +18,7 @@ const sampleData = [
 ];
 
 export function DataTableVisual({ visual }: DataTableVisualProps) {
-  const { getFilteredData, fields } = useDataStore();
+  const { getFilteredData } = useDataStore();
   const rawData = getFilteredData();
   const [currentPage, setCurrentPage] = useState(1);
 

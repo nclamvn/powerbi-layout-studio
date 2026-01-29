@@ -10,10 +10,12 @@ import { VISUAL_LABELS } from '../../constants/visualDefaults';
 import { Visual, VisualType } from '../../types/visual.types';
 
 export function PropertiesPanel() {
-  const { visuals, selectedVisualId, updateVisual } = useProjectStore();
+  const { visuals, selectedVisualIds, updateVisual } = useProjectStore();
   const { fields } = useDataStore();
   const { propertiesTab, setPropertiesTab, setPropertiesPanelOpen } = useUIStore();
 
+  // Properties panel only works for single selection
+  const selectedVisualId = selectedVisualIds.length === 1 ? selectedVisualIds[0] : null;
   const selectedVisual = visuals.find((v) => v.id === selectedVisualId);
 
   if (!selectedVisual) return null;

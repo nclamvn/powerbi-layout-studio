@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { Download, FileJson, FileText, Save, Copy, Check } from 'lucide-react';
+import { FileJson, FileText, Save, Copy, Check } from 'lucide-react';
 import { useProjectStore } from '../../stores/projectStore';
 import { useExport } from '../../hooks/useExport';
 import { generateSpecs, exportToJSON } from '../../utils/specGenerator';

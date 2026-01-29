@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Search, X } from 'lucide-react';
+import { Check, Search } from 'lucide-react';
 import { SlicerVisual as SlicerVisualType } from '../../types/visual.types';
 import { useDataStore } from '../../stores/dataStore';
 import { VisualWrapper } from './VisualWrapper';

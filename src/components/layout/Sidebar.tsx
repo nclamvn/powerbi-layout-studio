@@ -102,7 +102,7 @@ export function Sidebar() {
       </div>
 
       {/* Tab Navigation */}
-      <nav className="p-2 space-y-1">
+      <nav className="py-2 space-y-0.5">
         {tabs.map((tab) => (
           <Tooltip
             key={tab.id}
@@ -113,16 +113,38 @@ export function Sidebar() {
             <button
               onClick={() => setSidebarTab(tab.id)}
               className={`
-                w-full flex items-center gap-3 px-3 py-3 rounded-xl
-                transition-all duration-200 group
+                w-full flex items-center gap-3 px-4 py-3
+                transition-all duration-300 group relative
                 ${sidebarCollapsed ? 'justify-center' : ''}
                 ${
                   sidebarTab === tab.id
-                    ? 'bg-primary-500/15 text-primary-400 border-l-[3px] border-primary-500'
-                    : 'text-white/60 hover:bg-white/5 hover:text-white/80 border-l-[3px] border-transparent'
+                    ? 'text-white'
+                    : 'text-white/50 hover:text-white/80'
                 }
               `}
+              style={{
+                background: sidebarTab === tab.id
+                  ? 'linear-gradient(90deg, rgba(82, 183, 136, 0.25) 0%, rgba(82, 183, 136, 0.08) 50%, transparent 100%)'
+                  : 'transparent',
+              }}
+              onMouseEnter={(e) => {
+                if (sidebarTab !== tab.id) {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (sidebarTab !== tab.id) {
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
             >
+              {/* Left accent bar */}
+              <div
+                className={`
+                  absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 transition-all duration-300
+                  ${sidebarTab === tab.id ? 'bg-primary-400 opacity-100' : 'bg-white/30 opacity-0 group-hover:opacity-50'}
+                `}
+              />
               <tab.icon className="w-5 h-5 flex-shrink-0" />
               <AnimatePresence mode="wait">
                 {!sidebarCollapsed && (
@@ -139,7 +161,7 @@ export function Sidebar() {
               </AnimatePresence>
               {!sidebarCollapsed && (
                 <ChevronRight
-                  className={`w-4 h-4 transition-transform flex-shrink-0 ${
+                  className={`w-4 h-4 transition-transform duration-300 flex-shrink-0 ${
                     sidebarTab === tab.id ? 'rotate-90' : ''
                   }`}
                 />

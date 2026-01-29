@@ -15,8 +15,9 @@ import { useAutoSave } from './hooks/useAutoSave';
 import { FileJson, FileText } from 'lucide-react';
 
 function AppContent() {
-  const { selectedVisualId, visuals } = useProjectStore();
+  const { selectedVisualIds, visuals } = useProjectStore();
   const { propertiesPanelOpen, isExportModalOpen, setExportModalOpen } = useUIStore();
+  const selectedVisualId = selectedVisualIds.length === 1 ? selectedVisualIds[0] : null;
   const { handleExportJSON, handleExportPDF } = useExport();
 
   // Initialize keyboard shortcuts

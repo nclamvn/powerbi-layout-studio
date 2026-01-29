@@ -1,7 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { DndContext, DragEndEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
+import { AnimatePresence } from 'framer-motion';
 import { useProjectStore } from '../../stores/projectStore';
 import { useUIStore } from '../../stores/uiStore';
+import { useMultiSelect } from '../../hooks/useMultiSelect';
 import { KPICard } from '../visuals/KPICard';
 import { LineChartVisual } from '../visuals/LineChartVisual';
 import { BarChartVisual } from '../visuals/BarChartVisual';
@@ -12,12 +14,45 @@ import { GaugeVisual } from '../visuals/GaugeVisual';
 import { FunnelVisual } from '../visuals/FunnelVisual';
 import { TreemapVisual } from '../visuals/TreemapVisual';
 import { MatrixVisual } from '../visuals/MatrixVisual';
+import { SelectionBox } from './SelectionBox';
+import { AlignmentToolbar } from './AlignmentToolbar';
 import { VisualType, Visual } from '../../types/visual.types';
 
 export function Canvas() {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const { visuals, canvasSize, moveVisual, selectVisual, addVisual } = useProjectStore();
+  const innerRef = useRef<HTMLDivElement>(null);
+  const {
+    visuals,
+    canvasSize,
+    moveVisual,
+    moveVisuals,
+    selectVisual,
+    addVisual,
+    selectedVisualIds,
+    selectAllVisuals,
+    clearSelection,
+    duplicateVisuals,
+    removeVisuals,
+    copyVisuals,
+    pasteVisuals,
+  } = useProjectStore();
   const { canvasZoom, showGrid, gridSize, snapToGrid } = useUIStore();
+
+  const {
+    isSelecting,
+    selectionBox,
+    handleCanvasMouseDown,
+    handleCanvasMouseMove,
+    handleCanvasMouseUp,
+    setCanvasRef,
+  } = useMultiSelect();
+
+  // Set canvas ref for multi-select
+  useEffect(() => {
+    if (innerRef.current) {
+      setCanvasRef(innerRef.current);
+    }
+  }, [setCanvasRef]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -38,7 +73,12 @@ export function Canvas() {
         y = Math.round(y / gridSize) * gridSize;
       }
 
-      moveVisual(active.id as string, { x, y });
+      // If dragging a selected visual, move all selected visuals
+      if (selectedVisualIds.includes(active.id as string) && selectedVisualIds.length > 1) {
+        moveVisuals(selectedVisualIds, { x, y });
+      } else {
+        moveVisual(active.id as string, { x, y });
+      }
     }
   };
 
@@ -64,6 +104,82 @@ export function Canvas() {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle shortcuts when typing in inputs
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Ctrl/Cmd + A: Select all
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
+        selectAllVisuals();
+      }
+
+      // Escape: Clear selection
+      if (e.key === 'Escape') {
+        clearSelection();
+      }
+
+      // Delete/Backspace: Remove selected visuals
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedVisualIds.length > 0) {
+        e.preventDefault();
+        removeVisuals(selectedVisualIds);
+      }
+
+      // Ctrl/Cmd + D: Duplicate selected
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd' && selectedVisualIds.length > 0) {
+        e.preventDefault();
+        duplicateVisuals(selectedVisualIds);
+      }
+
+      // Ctrl/Cmd + C: Copy
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedVisualIds.length > 0) {
+        e.preventDefault();
+        copyVisuals();
+      }
+
+      // Ctrl/Cmd + V: Paste
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        e.preventDefault();
+        pasteVisuals();
+      }
+
+      // Arrow keys: Move selected visuals
+      if (selectedVisualIds.length > 0) {
+        const moveAmount = e.shiftKey ? 10 : 1;
+
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          moveVisuals(selectedVisualIds, { x: 0, y: -moveAmount });
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          moveVisuals(selectedVisualIds, { x: 0, y: moveAmount });
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          moveVisuals(selectedVisualIds, { x: -moveAmount, y: 0 });
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          moveVisuals(selectedVisualIds, { x: moveAmount, y: 0 });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    selectedVisualIds,
+    selectAllVisuals,
+    clearSelection,
+    removeVisuals,
+    duplicateVisuals,
+    copyVisuals,
+    pasteVisuals,
+    moveVisuals,
+  ]);
 
   const renderVisual = (visual: Visual) => {
     switch (visual.type) {
@@ -94,6 +210,9 @@ export function Canvas() {
 
   return (
     <div className="flex-1 overflow-auto bg-dark-deepest p-8 relative">
+      {/* Alignment Toolbar */}
+      <AlignmentToolbar />
+
       {/* Empty state - positioned relative to viewport */}
       {visuals.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white/30 pointer-events-none z-10">
@@ -126,11 +245,16 @@ export function Canvas() {
             boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.5)',
           }}
           onClick={handleCanvasClick}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleCanvasMouseUp}
+          onMouseLeave={handleCanvasMouseUp}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
           {/* Inner container for zoom transform */}
           <div
+            ref={innerRef}
             id="canvas-inner"
             className="absolute inset-0 origin-top-left"
             style={{
@@ -140,6 +264,13 @@ export function Canvas() {
             }}
           >
             {visuals.map(renderVisual)}
+
+            {/* Selection Box */}
+            <AnimatePresence>
+              {isSelecting && selectionBox && (
+                <SelectionBox box={selectionBox} zoom={1} />
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Canvas size indicator */}

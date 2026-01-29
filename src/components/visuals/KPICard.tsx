@@ -9,7 +9,7 @@ interface KPICardProps {
 }
 
 export function KPICard({ visual }: KPICardProps) {
-  const { aggregateData, rawData } = useDataStore();
+  const { aggregateData } = useDataStore();
 
   const value = visual.data.field
     ? aggregateData(visual.data.field, visual.data.aggregation)
