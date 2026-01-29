@@ -1,21 +1,52 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database, LayoutGrid, Palette, Download, ChevronRight, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Database, LayoutGrid, Palette, Download, ChevronRight, PanelLeftClose, PanelLeft, LayoutTemplate } from 'lucide-react';
 import { DataPanel } from '../panels/DataPanel';
 import { VisualsLibrary } from '../panels/VisualsLibrary';
 import { ThemePanel } from '../panels/ThemePanel';
 import { ExportPanel } from '../panels/ExportPanel';
+import { TemplateGallery } from '../templates/TemplateGallery';
+import { TemplatePreviewModal } from '../templates/TemplatePreviewModal';
 import { useUIStore } from '../../stores/uiStore';
+import { useProjectStore } from '../../stores/projectStore';
+import { useDataStore } from '../../stores/dataStore';
 import { Tooltip } from '../ui/Tooltip';
+import { DashboardTemplate } from '../../types/template.types';
+import { Visual } from '../../types/visual.types';
+import { nanoid } from 'nanoid';
 
 const tabs = [
   { id: 'data', icon: Database, label: 'Data' },
   { id: 'visuals', icon: LayoutGrid, label: 'Visuals' },
+  { id: 'templates', icon: LayoutTemplate, label: 'Templates' },
   { id: 'theme', icon: Palette, label: 'Theme' },
   { id: 'export', icon: Download, label: 'Export' },
 ] as const;
 
 export function Sidebar() {
   const { sidebarTab, setSidebarTab, sidebarCollapsed, toggleSidebarCollapsed } = useUIStore();
+  const { setVisuals, setCanvasSize, setProjectName } = useProjectStore();
+  const { importData } = useDataStore();
+
+  const handleApplyTemplate = (template: DashboardTemplate) => {
+    // Create new visuals with fresh IDs
+    const newVisuals = template.visuals.map((visual) => ({
+      ...visual,
+      id: nanoid(),
+    })) as Visual[];
+
+    // Apply template
+    setProjectName(template.name);
+    setCanvasSize(template.canvasSize);
+    setVisuals(newVisuals);
+
+    // Load sample data if available
+    if (template.sampleData && template.sampleData.length > 0) {
+      importData(template.sampleData, `${template.name} Sample Data`);
+    }
+
+    // Switch to visuals tab after applying
+    setSidebarTab('visuals');
+  };
 
   return (
     <motion.aside
@@ -137,6 +168,7 @@ export function Sidebar() {
             >
               {sidebarTab === 'data' && <DataPanel />}
               {sidebarTab === 'visuals' && <VisualsLibrary />}
+              {sidebarTab === 'templates' && <TemplateGallery onSelectTemplate={handleApplyTemplate} />}
               {sidebarTab === 'theme' && <ThemePanel />}
               {sidebarTab === 'export' && <ExportPanel />}
             </motion.div>
@@ -150,6 +182,9 @@ export function Sidebar() {
           <div className="w-1 h-8 rounded-full bg-primary-500/20" />
         </div>
       )}
+
+      {/* Template Preview Modal */}
+      <TemplatePreviewModal onApply={handleApplyTemplate} />
     </motion.aside>
   );
 }
