@@ -5,6 +5,7 @@ type PropertiesTab = 'position' | 'style' | 'data' | 'formatting';
 
 interface UIState {
   sidebarTab: SidebarTab;
+  sidebarCollapsed: boolean;
   propertiesPanelOpen: boolean;
   propertiesTab: PropertiesTab;
   isExportModalOpen: boolean;
@@ -16,6 +17,8 @@ interface UIState {
 
   // Actions
   setSidebarTab: (tab: SidebarTab) => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebarCollapsed: () => void;
   setPropertiesPanelOpen: (open: boolean) => void;
   setPropertiesTab: (tab: PropertiesTab) => void;
   setExportModalOpen: (open: boolean) => void;
@@ -28,6 +31,7 @@ interface UIState {
 
 export const useUIStore = create<UIState>((set) => ({
   sidebarTab: 'visuals',
+  sidebarCollapsed: false,
   propertiesPanelOpen: true,
   propertiesTab: 'position',
   isExportModalOpen: false,
@@ -38,6 +42,8 @@ export const useUIStore = create<UIState>((set) => ({
   gridSize: 20,
 
   setSidebarTab: (tab) => set({ sidebarTab: tab }),
+  setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+  toggleSidebarCollapsed: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
   setPropertiesPanelOpen: (open) => set({ propertiesPanelOpen: open }),
   setPropertiesTab: (tab) => set({ propertiesTab: tab }),
   setExportModalOpen: (open) => set({ isExportModalOpen: open }),

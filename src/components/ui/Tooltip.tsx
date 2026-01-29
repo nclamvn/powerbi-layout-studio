@@ -7,6 +7,7 @@ interface TooltipProps {
   side?: 'top' | 'right' | 'bottom' | 'left';
   sideOffset?: number;
   delayDuration?: number;
+  disabled?: boolean;
 }
 
 export function Tooltip({
@@ -15,7 +16,12 @@ export function Tooltip({
   side = 'top',
   sideOffset = 5,
   delayDuration = 200,
+  disabled = false,
 }: TooltipProps) {
+  if (disabled) {
+    return <>{children}</>;
+  }
+
   return (
     <TooltipPrimitive.Provider delayDuration={delayDuration}>
       <TooltipPrimitive.Root>
