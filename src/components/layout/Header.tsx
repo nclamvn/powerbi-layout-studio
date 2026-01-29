@@ -1,23 +1,27 @@
 import { useState } from 'react';
-import { Save, Undo2, Redo2, Download, ZoomIn, ZoomOut, Maximize2, Settings, FolderOpen, Keyboard } from 'lucide-react';
+import { Save, Undo2, Redo2, Download, ZoomIn, ZoomOut, Maximize2, Settings, FolderOpen, Keyboard, Sparkles } from 'lucide-react';
 import { useProjectStore } from '../../stores/projectStore';
 import { useUIStore } from '../../stores/uiStore';
+import { useDataStore } from '../../stores/dataStore';
 import { useExport } from '../../hooks/useExport';
 import { useHistory } from '../../hooks/useHistory';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { KeyboardShortcutsModal } from '../modals/KeyboardShortcutsModal';
+import { AutoLayoutWizard } from '../auto-layout/AutoLayoutWizard';
 import { Tooltip } from '../ui/Tooltip';
 
 export function Header() {
   const { projectName, setProjectName, visuals, loadProject, clearProject } = useProjectStore();
   const { canvasZoom, setCanvasZoom, setExportModalOpen } = useUIStore();
+  const { rawData } = useDataStore();
   const { handleSaveProject } = useExport();
   const { handleUndo, handleRedo, canUndo, canRedo } = useHistory();
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(projectName);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [showAutoLayout, setShowAutoLayout] = useState(false);
 
   const handleNameSubmit = () => {
     setProjectName(tempName);
@@ -145,6 +149,17 @@ export function Header() {
           Save
         </Button>
 
+        {rawData.length > 0 && (
+          <Tooltip content="Smart Auto-Layout">
+            <button
+              onClick={() => setShowAutoLayout(true)}
+              className="p-2 rounded-lg text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 transition-colors"
+            >
+              <Sparkles className="w-5 h-5" />
+            </button>
+          </Tooltip>
+        )}
+
         <div className="w-px h-6 bg-white/10 mx-1" />
 
         <Button
@@ -209,6 +224,12 @@ export function Header() {
       <KeyboardShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* Auto Layout Wizard */}
+      <AutoLayoutWizard
+        isOpen={showAutoLayout}
+        onClose={() => setShowAutoLayout(false)}
       />
     </header>
   );

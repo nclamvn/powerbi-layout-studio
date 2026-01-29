@@ -1,9 +1,11 @@
-import { useCallback } from 'react';
-import { Upload, FileSpreadsheet, Database, X, Hash, Type, Calendar, ToggleLeft } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { Upload, FileSpreadsheet, Database, X, Hash, Type, Calendar, ToggleLeft, Sparkles, Wand2 } from 'lucide-react';
 import { useDataStore } from '../../stores/dataStore';
 import { parseFile } from '../../utils/dataParser';
 import { Button } from '../ui/Button';
+import { GlassPanel } from '../ui/GlassPanel';
 import { FieldType } from '../../types/data.types';
+import { AutoLayoutWizard } from '../auto-layout/AutoLayoutWizard';
 
 const fieldTypeIcons: Record<FieldType, typeof Hash> = {
   number: Hash,
@@ -14,6 +16,7 @@ const fieldTypeIcons: Record<FieldType, typeof Hash> = {
 
 export function DataPanel() {
   const { rawData, fields, fileName, importData, clearData } = useDataStore();
+  const [showAutoLayout, setShowAutoLayout] = useState(false);
 
   const handleFileUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,12 +105,34 @@ export function DataPanel() {
             </div>
           </div>
 
+          {/* Auto Layout Section */}
+          <div className="pt-4 border-t border-white/10">
+            <GlassPanel variant="subtle" padding="sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
+                  <Wand2 className="w-5 h-5 text-primary-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-medium text-white">Smart Auto-Layout</h4>
+                  <p className="text-xs text-white/50">AI generates dashboard from your data</p>
+                </div>
+              </div>
+              <Button
+                className="w-full mt-3"
+                onClick={() => setShowAutoLayout(true)}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate Layout
+              </Button>
+            </GlassPanel>
+          </div>
+
           {/* Replace button */}
-          <label>
-            <Button variant="secondary" className="w-full" as="span">
+          <label className="block cursor-pointer">
+            <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white/70 hover:bg-white/10 hover:text-white transition-all">
               <Upload className="w-4 h-4" />
               Replace Data
-            </Button>
+            </div>
             <input
               type="file"
               accept=".csv,.xlsx,.xls,.json"
@@ -117,6 +142,12 @@ export function DataPanel() {
           </label>
         </>
       )}
+
+      {/* Auto Layout Wizard Modal */}
+      <AutoLayoutWizard
+        isOpen={showAutoLayout}
+        onClose={() => setShowAutoLayout(false)}
+      />
     </div>
   );
 }
