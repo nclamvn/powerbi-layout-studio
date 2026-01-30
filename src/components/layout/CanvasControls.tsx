@@ -37,7 +37,7 @@ export function CanvasControls() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <GlassPanel padding="sm" className="flex items-center gap-1">
+      <GlassPanel padding="sm" className="flex items-center gap-1 !rounded-full px-4">
         {/* Undo/Redo */}
         <Tooltip content="Undo (Ctrl+Z)">
           <button

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database, LayoutGrid, Palette, Download, ChevronRight, PanelLeftClose, PanelLeft, LayoutTemplate } from 'lucide-react';
+import { Database, LayoutGrid, Palette, Download, ChevronRight, ChevronLeft, PanelLeftClose, PanelLeft, LayoutTemplate } from 'lucide-react';
 import { DataPanel } from '../panels/DataPanel';
 import { VisualsLibrary } from '../panels/VisualsLibrary';
 import { ThemePanel } from '../panels/ThemePanel';
@@ -60,8 +60,38 @@ export function Sidebar() {
         boxShadow: '4px 0 24px rgba(0, 0, 0, 0.3)',
       }}
     >
-      {/* Logo & Collapse Toggle */}
-      <div className="p-4 border-b border-primary-700/30">
+      {/* Mobile: Back & Collapse row */}
+      <div className="sm:hidden p-2 border-b border-primary-700/30">
+        <div className="flex items-center justify-between">
+          {/* Back button - hidden when collapsed */}
+          {!sidebarCollapsed && (
+            <a
+              href="/"
+              className="p-2 text-white/60 hover:text-white transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </a>
+          )}
+
+          {/* Collapse/Expand button */}
+          <button
+            onClick={toggleSidebarCollapsed}
+            className={`
+              p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all
+              ${sidebarCollapsed ? 'mx-auto' : 'ml-auto'}
+            `}
+          >
+            {sidebarCollapsed ? (
+              <PanelLeft className="w-5 h-5" />
+            ) : (
+              <PanelLeftClose className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop: Logo & Collapse Toggle */}
+      <div className="hidden sm:block p-4 border-b border-primary-700/30">
         <div className="flex items-center justify-between">
           <AnimatePresence mode="wait">
             {!sidebarCollapsed && (
@@ -186,7 +216,7 @@ export function Sidebar() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2 }}
-              className="h-full overflow-y-auto p-4"
+              className="h-full overflow-y-auto p-2 sm:p-4"
             >
               {sidebarTab === 'data' && <DataPanel />}
               {sidebarTab === 'visuals' && <VisualsLibrary />}

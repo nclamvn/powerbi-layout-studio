@@ -50,9 +50,9 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 flex items-center justify-between px-4 border-b border-white/5 bg-dark-base/80 backdrop-blur-xl">
+    <header className="h-12 sm:h-16 flex items-center justify-between px-2 sm:px-4 border-b border-white/5 bg-dark-base/80 backdrop-blur-xl">
       {/* Left: Project Name */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         {isEditing ? (
           <form
             onSubmit={(e) => {
@@ -65,7 +65,7 @@ export function Header() {
               type="text"
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
-              className="px-3 py-1.5 bg-dark-surface border border-primary-500/50 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-dark-surface border border-primary-500/50 rounded-lg text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 w-24 sm:w-auto"
               autoFocus
               onBlur={handleNameSubmit}
             />
@@ -76,18 +76,18 @@ export function Header() {
               setTempName(projectName);
               setIsEditing(true);
             }}
-            className="text-white font-medium hover:text-primary-400 transition-colors"
+            className="text-white text-sm sm:text-base font-medium hover:text-primary-400 transition-colors truncate max-w-[100px] sm:max-w-none"
           >
             {projectName}
           </button>
         )}
 
-        <span className="text-xs text-white/30 bg-white/5 px-2 py-1 rounded">
+        <span className="text-[10px] sm:text-xs text-white/30 bg-white/5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap">
           {visuals.length} visuals
         </span>
 
-        {/* Undo/Redo */}
-        <div className="flex items-center gap-1 ml-2">
+        {/* Undo/Redo - Hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-1 ml-2">
           <Tooltip content="Undo (Ctrl+Z)">
             <button
               onClick={handleUndo}
@@ -109,8 +109,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Center: Zoom Controls */}
-      <div className="flex items-center gap-2 bg-dark-surface/50 rounded-xl px-2 py-1">
+      {/* Center: Zoom Controls - Simplified on mobile */}
+      <div className="hidden sm:flex items-center gap-2 bg-dark-surface/50 rounded-xl px-2 py-1">
         <button
           onClick={() => setCanvasZoom(canvasZoom - 0.1)}
           className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
@@ -137,58 +137,64 @@ export function Header() {
         </button>
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={handleLoadProject}>
-          <FolderOpen className="w-4 h-4" />
-          Open
-        </Button>
+      {/* Right: Actions - Simplified on mobile */}
+      <div className="flex items-center gap-1 sm:gap-2">
+        <div className="hidden sm:flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={handleLoadProject}>
+            <FolderOpen className="w-4 h-4" />
+            Open
+          </Button>
 
-        <Button variant="ghost" size="sm" onClick={handleSaveProject}>
-          <Save className="w-4 h-4" />
-          Save
-        </Button>
+          <Button variant="ghost" size="sm" onClick={handleSaveProject}>
+            <Save className="w-4 h-4" />
+            Save
+          </Button>
 
-        {rawData.length > 0 && (
-          <Tooltip content="Smart Auto-Layout">
-            <button
-              onClick={() => setShowAutoLayout(true)}
-              className="p-2 rounded-lg text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 transition-colors"
-            >
-              <Sparkles className="w-5 h-5" />
-            </button>
-          </Tooltip>
-        )}
+          {rawData.length > 0 && (
+            <Tooltip content="Smart Auto-Layout">
+              <button
+                onClick={() => setShowAutoLayout(true)}
+                className="p-2 rounded-lg text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 transition-colors"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+            </Tooltip>
+          )}
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+          <div className="w-px h-6 bg-white/10 mx-1" />
+        </div>
 
         <Button
           variant="primary"
           size="sm"
           onClick={() => setExportModalOpen(true)}
           disabled={visuals.length === 0}
+          className="text-xs sm:text-sm px-2 sm:px-3"
         >
-          <Download className="w-4 h-4" />
-          Export Specs
+          <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Export Specs</span>
+          <span className="sm:hidden">Export</span>
         </Button>
 
-        <Tooltip content="Keyboard Shortcuts (?)">
-          <button
-            onClick={() => setIsShortcutsOpen(true)}
-            className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <Keyboard className="w-5 h-5" />
-          </button>
-        </Tooltip>
+        <div className="hidden sm:flex items-center gap-1">
+          <Tooltip content="Keyboard Shortcuts (?)">
+            <button
+              onClick={() => setIsShortcutsOpen(true)}
+              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <Keyboard className="w-5 h-5" />
+            </button>
+          </Tooltip>
 
-        <Tooltip content="Settings">
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
-        </Tooltip>
+          <Tooltip content="Settings">
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </Tooltip>
+        </div>
       </div>
 
       {/* Settings Modal */}

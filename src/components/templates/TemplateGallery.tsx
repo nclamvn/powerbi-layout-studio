@@ -56,22 +56,22 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onSelectTempla
   return (
     <div className="flex flex-col h-full">
       {/* Search */}
-      <div className="p-3 border-b border-gray-700">
+      <div className="p-2 sm:p-3 border-b border-gray-700">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search templates..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full bg-gray-800 border border-gray-600 rounded-lg pl-7 sm:pl-10 pr-8 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           )}
         </div>
