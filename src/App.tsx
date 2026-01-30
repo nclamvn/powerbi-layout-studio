@@ -43,11 +43,13 @@ function AppContent() {
         <Header />
 
         {/* Canvas Container */}
-        <div className="flex-1 relative overflow-hidden">
-          <Canvas />
+        <div className="flex-1 relative">
+          <div className="absolute inset-0 overflow-hidden">
+            <Canvas />
+          </div>
           {/* Controls centered at bottom */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-50">
-            <div className="pointer-events-auto mx-4">
+            <div className="pointer-events-auto">
               <CanvasControls />
             </div>
           </div>
