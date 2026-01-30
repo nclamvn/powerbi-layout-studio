@@ -33,7 +33,7 @@ function AppContent() {
   };
 
   return (
-    <div className="h-screen w-screen flex bg-dark-deepest overflow-hidden">
+    <div className="h-screen w-screen flex bg-dark-deepest overflow-hidden relative">
       {/* Sidebar */}
       <Sidebar />
 
@@ -47,12 +47,13 @@ function AppContent() {
           <div className="absolute inset-0 overflow-hidden">
             <Canvas />
           </div>
-          {/* Controls centered at bottom */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-50">
-            <div className="pointer-events-auto">
-              <CanvasControls />
-            </div>
-          </div>
+        </div>
+      </div>
+
+      {/* Controls - positioned at bottom center, above everything */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-[100]">
+        <div className="pointer-events-auto">
+          <CanvasControls />
         </div>
       </div>
 
