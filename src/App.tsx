@@ -38,7 +38,7 @@ function AppContent() {
       <Sidebar />
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Header */}
         <Header />
 
@@ -48,12 +48,12 @@ function AppContent() {
             <Canvas />
           </div>
         </div>
-      </div>
 
-      {/* Controls - positioned at bottom center */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-40">
-        <div className="pointer-events-auto">
-          <CanvasControls />
+        {/* Controls - centered at bottom of canvas area */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-40">
+          <div className="pointer-events-auto">
+            <CanvasControls />
+          </div>
         </div>
       </div>
 
