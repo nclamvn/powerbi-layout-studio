@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type SidebarTab = 'data' | 'visuals' | 'templates' | 'theme' | 'export';
+type SidebarTab = 'ai' | 'data' | 'visuals' | 'templates' | 'theme' | 'export';
 type PropertiesTab = 'position' | 'style' | 'data' | 'formatting';
 
 interface UIState {

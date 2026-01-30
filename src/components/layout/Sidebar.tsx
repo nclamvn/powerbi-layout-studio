@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database, LayoutGrid, Palette, Download, ChevronRight, ChevronLeft, PanelLeftClose, PanelLeft, LayoutTemplate } from 'lucide-react';
+import { Database, LayoutGrid, Palette, Download, ChevronRight, ChevronLeft, PanelLeftClose, PanelLeft, LayoutTemplate, Sparkles } from 'lucide-react';
 import { DataPanel } from '../panels/DataPanel';
 import { VisualsLibrary } from '../panels/VisualsLibrary';
 import { ThemePanel } from '../panels/ThemePanel';
@@ -18,6 +18,7 @@ import { nanoid } from 'nanoid';
 const LANDING_PAGE_URL = import.meta.env.VITE_LANDING_PAGE_URL || 'http://localhost:3002';
 
 const tabs = [
+  { id: 'ai', icon: Sparkles, label: 'AI Generator' },
   { id: 'data', icon: Database, label: 'Data' },
   { id: 'visuals', icon: LayoutGrid, label: 'Visuals' },
   { id: 'templates', icon: LayoutTemplate, label: 'Templates' },
@@ -209,6 +210,7 @@ export function Sidebar() {
               transition={{ duration: 0.2 }}
               className="h-full overflow-y-auto p-2 sm:p-4"
             >
+              {/* AI tab renders AIChatPanel in main area instead */}
               {sidebarTab === 'data' && <DataPanel />}
               {sidebarTab === 'visuals' && <VisualsLibrary />}
               {sidebarTab === 'templates' && <TemplateGallery onSelectTemplate={handleApplyTemplate} />}

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
@@ -7,18 +8,23 @@ import { CanvasControls } from './components/layout/CanvasControls';
 import { Modal } from './components/ui/Modal';
 import { ToastProvider } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AIChatPanel, APIKeyModal } from './components/ai';
 import { useProjectStore } from './stores/projectStore';
 import { useUIStore } from './stores/uiStore';
+import { useDataStore } from './stores/dataStore';
 import { useExport } from './hooks/useExport';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
 import { FileJson, FileText } from 'lucide-react';
+import { Visual } from './types/visual.types';
 
 function AppContent() {
-  const { selectedVisualIds, visuals } = useProjectStore();
-  const { propertiesPanelOpen, isExportModalOpen, setExportModalOpen } = useUIStore();
+  const { selectedVisualIds, visuals, setVisuals, setProjectName } = useProjectStore();
+  const { sidebarTab, setSidebarTab, propertiesPanelOpen, isExportModalOpen, setExportModalOpen } = useUIStore();
+  const { importData } = useDataStore();
   const selectedVisualId = selectedVisualIds.length === 1 ? selectedVisualIds[0] : null;
   const { handleExportJSON, handleExportPDF } = useExport();
+  const [showAPIKeyModal, setShowAPIKeyModal] = useState(false);
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts();
@@ -26,11 +32,23 @@ function AppContent() {
   // Initialize auto-save
   useAutoSave();
 
+  // Handle AI generated dashboard
+  const handleApplyAIDashboard = (aiVisuals: Visual[], projectName: string, sampleData?: Record<string, unknown>[]) => {
+    setProjectName(projectName);
+    setVisuals(aiVisuals);
+    if (sampleData && sampleData.length > 0) {
+      importData(sampleData, `${projectName} Sample Data`);
+    }
+  };
+
   const handleExportPDFClick = () => {
     const canvasElement = document.getElementById('canvas-area');
     handleExportPDF(canvasElement);
     setExportModalOpen(false);
   };
+
+  // Check if AI tab is active
+  const isAITabActive = sidebarTab === 'ai';
 
   return (
     <div className="h-screen w-screen flex bg-dark-deepest overflow-hidden relative">
@@ -39,28 +57,46 @@ function AppContent() {
 
       {/* Main Area */}
       <div className="flex-1 flex flex-col min-w-0 relative">
-        {/* Header */}
-        <Header />
+        {/* Header - only show when not in AI tab */}
+        {!isAITabActive && <Header />}
 
-        {/* Canvas Container */}
-        <div className="flex-1 relative">
-          <div className="absolute inset-0 overflow-hidden">
-            <Canvas />
-          </div>
-        </div>
+        {/* Content Area - Switch between AI Panel and Canvas */}
+        {isAITabActive ? (
+          <AIChatPanel
+            onApplyDashboard={handleApplyAIDashboard}
+            onSwitchToCanvas={() => setSidebarTab('visuals')}
+            onOpenAPIKeySettings={() => setShowAPIKeyModal(true)}
+          />
+        ) : (
+          <>
+            {/* Canvas Container */}
+            <div className="flex-1 relative">
+              <div className="absolute inset-0 overflow-hidden">
+                <Canvas />
+              </div>
+            </div>
 
-        {/* Controls - centered at bottom of canvas area */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-40">
-          <div className="pointer-events-auto">
-            <CanvasControls />
-          </div>
-        </div>
+            {/* Controls - centered at bottom of canvas area */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-40">
+              <div className="pointer-events-auto">
+                <CanvasControls />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Properties Panel */}
+      {/* Properties Panel - only show when not in AI tab */}
       <AnimatePresence>
-        {selectedVisualId && propertiesPanelOpen && <PropertiesPanel />}
+        {!isAITabActive && selectedVisualId && propertiesPanelOpen && <PropertiesPanel />}
       </AnimatePresence>
+
+      {/* API Key Modal */}
+      <APIKeyModal
+        isOpen={showAPIKeyModal}
+        onClose={() => setShowAPIKeyModal(false)}
+        onSave={() => setShowAPIKeyModal(false)}
+      />
 
       {/* Export Modal */}
       <Modal
