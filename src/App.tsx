@@ -50,8 +50,8 @@ function AppContent() {
         </div>
       </div>
 
-      {/* Controls - positioned at bottom center, above everything */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-[100]">
+      {/* Controls - positioned at bottom center */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-40">
         <div className="pointer-events-auto">
           <CanvasControls />
         </div>
