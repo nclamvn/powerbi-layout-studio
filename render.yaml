@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: powerbi-layout-studio
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_LANDING_PAGE_URL
+        sync: false
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: ALLOWALL
