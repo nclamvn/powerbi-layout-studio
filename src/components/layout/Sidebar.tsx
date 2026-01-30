@@ -93,31 +93,20 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Desktop: Logo & Collapse Toggle */}
-      <div className="hidden sm:block p-4 border-b border-primary-700/30">
-        <div className="flex items-center justify-between">
-          <AnimatePresence mode="wait">
-            {!sidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
-                  <LayoutGrid className="w-5 h-5 text-primary-400" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-white">Layout Studio</h1>
-                  <p className="text-xs text-primary-400/70">Power BI Prototyper</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Desktop: Back & Collapse Toggle */}
+      <div className="hidden sm:flex p-3 border-b border-primary-700/30 items-center justify-between">
+        {/* Back button - hidden when collapsed */}
+        {!sidebarCollapsed && (
+          <a
+            href={LANDING_PAGE_URL}
+            className="p-2 text-white/60 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </a>
+        )}
 
-          <Tooltip content={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} side="right">
-            <button
+        <Tooltip content={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} side="right">
+          <button
               onClick={toggleSidebarCollapsed}
               className={`
                 p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all
@@ -131,7 +120,6 @@ export function Sidebar() {
               )}
             </button>
           </Tooltip>
-        </div>
       </div>
 
       {/* Tab Navigation */}
