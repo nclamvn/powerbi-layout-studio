@@ -14,6 +14,9 @@ import { DashboardTemplate } from '../../types/template.types';
 import { Visual } from '../../types/visual.types';
 import { nanoid } from 'nanoid';
 
+// Landing page URL - configurable via environment variable
+const LANDING_PAGE_URL = import.meta.env.VITE_LANDING_PAGE_URL || 'http://localhost:3002';
+
 const tabs = [
   { id: 'data', icon: Database, label: 'Data' },
   { id: 'visuals', icon: LayoutGrid, label: 'Visuals' },
@@ -66,7 +69,7 @@ export function Sidebar() {
           {/* Back button - hidden when collapsed */}
           {!sidebarCollapsed && (
             <a
-              href="/"
+              href={LANDING_PAGE_URL}
               className="p-2 text-white/60 hover:text-white transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
