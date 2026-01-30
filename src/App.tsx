@@ -46,7 +46,7 @@ function AppContent() {
         <div className="flex-1 relative overflow-hidden">
           <Canvas />
           {/* Controls centered at bottom */}
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none z-50">
+          <div className="absolute bottom-6 left-4 right-4 flex justify-center pointer-events-none z-50">
             <div className="pointer-events-auto">
               <CanvasControls />
             </div>
